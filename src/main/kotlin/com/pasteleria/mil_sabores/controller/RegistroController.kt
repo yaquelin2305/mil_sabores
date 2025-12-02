@@ -13,21 +13,18 @@ class RegistroController(
     private val service: UsuarioService
 ) {
 
-    // POST ya existente: registrar nuevo usuario
     @PostMapping
     fun registrar(@RequestBody usuario: Usuario): ResponseEntity<Usuario> {
         val creado = service.guardar(usuario)
         return ResponseEntity.ok(creado)
     }
 
-    // GET -> Listar todos los usuarios
     @GetMapping
     fun listar(): ResponseEntity<List<Usuario>> {
         val lista = service.listarTodos()
         return ResponseEntity.ok(lista)
     }
 
-    // GET por id
     @GetMapping("/{id}")
     fun obtenerPorId(@PathVariable id: Long): ResponseEntity<Usuario> {
         val usuario = service.obtenerPorId(id)
@@ -35,7 +32,6 @@ class RegistroController(
         else ResponseEntity.notFound().build()
     }
 
-    // PUT -> actualizar usuario por id
     @PutMapping("/{id}")
     fun actualizar(@PathVariable id: Long, @RequestBody datos: Usuario): ResponseEntity<Usuario> {
         val actualizado = service.actualizar(id, datos)
@@ -43,7 +39,6 @@ class RegistroController(
         else ResponseEntity.notFound().build()
     }
 
-    // DELETE -> eliminar por id
     @DeleteMapping("/{id}")
     fun eliminar(@PathVariable id: Long): ResponseEntity<Void> {
         return try {

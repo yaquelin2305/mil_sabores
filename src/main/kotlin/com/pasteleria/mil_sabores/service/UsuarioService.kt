@@ -19,7 +19,6 @@ class UsuarioService(
 
     fun actualizar(id: Long, datos: Usuario): Usuario? {
         val existente = obtenerPorId(id) ?: return null
-        // Usamos copy para crear una nueva instancia con el mismo id y datos actualizados
         val actualizado = existente.copy(
             nombre = datos.nombre,
             correo = datos.correo,
