@@ -48,4 +48,24 @@ class RegistroController(
             ResponseEntity.notFound().build()
         }
     }
+    @PostMapping("/login")
+    fun login(@RequestBody datos: Map<String, String>): ResponseEntity<Any> {
+
+        println("### LOGIN RECIBIDO ###")
+        println("Correo: " + datos["correo"])
+        println("Contraseña: " + datos["contrasena"])
+
+        val correo = datos["correo"] ?: return ResponseEntity.badRequest().body("Falta el correo")
+        val contrasena = datos["contrasena"] ?: return ResponseEntity.badRequest().body("Falta la contraseña")
+
+        val usuario = service.login(correo, contrasena)
+
+        return if (usuario != null) {
+            ResponseEntity.ok(usuario)
+        } else {
+            ResponseEntity.status(401).body("Credenciales incorrectas")
+        }
+    }
+
+
 }

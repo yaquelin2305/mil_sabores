@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 class UsuarioService(
     private val repo: UsuarioRepository
 ) {
+
     fun guardar(usuario: Usuario): Usuario {
         return repo.save(usuario)
     }
@@ -30,5 +31,15 @@ class UsuarioService(
 
     fun eliminar(id: Long) {
         repo.deleteById(id)
+    }
+
+
+    fun login(correo: String, contrasena: String): Usuario? {
+        val usuario = repo.findByCorreo(correo)
+        return if (usuario != null && usuario.contrasena == contrasena) {
+            usuario
+        } else {
+            null
+        }
     }
 }
