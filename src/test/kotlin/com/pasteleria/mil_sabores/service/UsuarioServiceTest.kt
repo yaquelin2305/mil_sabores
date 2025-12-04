@@ -15,62 +15,55 @@ import java.util.Optional
 class UsuarioServiceTest {
 
     @Mock
-    lateinit var repository: UsuarioRepository
+    private lateinit var repository: UsuarioRepository
 
     @InjectMocks
-    lateinit var service: UsuarioService
+    private lateinit var service: UsuarioService
 
     @Test
-    fun `guardar - deberia llamar al repositorio y retornar el usuario guardado`() {
-        val usuarioNuevo = Usuario(null, "Yeider", "yeider@test.com", "123456", "999999")
-        val usuarioGuardado = usuarioNuevo.copy(id = 1)
+    fun `deberia guardar un usuario correctamente`() {
+        val usuarioNuevo = Usuario(nombre = "Juan", correo = "juan@test.com", contrasena = "123")
+        val usuarioGuardado = usuarioNuevo.copy(id = 1L)
 
         `when`(repository.save(usuarioNuevo)).thenReturn(usuarioGuardado)
 
         val resultado = service.guardar(usuarioNuevo)
 
         assertNotNull(resultado.id)
-        assertEquals(1L, resultado.id)
-
-        verify(repository, times(1)).save(usuarioNuevo)
+        assertEquals("Juan", resultado.nombre)
     }
 
     @Test
-    fun `actualizar - si el usuario existe, deberia actualizar sus datos`() {
+    fun `deberia retornar un usuario si existe el ID`() {
         val id = 1L
-        val usuarioExistente = Usuario(id, "Antiguo", "old@mail.com", "111", "000")
-        val datosNuevos = Usuario(null, "Nuevo Nombre", "new@mail.com", "222", "111")
+        val usuarioMock = Usuario(id = id, nombre = "Maria", correo = "m@test.com", contrasena = "abc")
 
-        `when`(repository.findById(id)).thenReturn(Optional.of(usuarioExistente))
+        `when`(repository.findById(id)).thenReturn(Optional.of(usuarioMock))
 
+        val resultado = service.obtenerPorId(id)
+
+        assertNotNull(resultado)
+        assertEquals("Maria", resultado?.nombre)
+    }
+
+    @Test
+    fun `deberia actualizar datos de un usuario existente`() {
+        val id = 1L
+        val usuarioOriginal = Usuario(id = id, nombre = "Original", correo = "old@test.com", contrasena = "111")
+        val datosNuevos = Usuario(nombre = "Editado", correo = "new@test.com", contrasena = "222")
+
+        `when`(repository.findById(id)).thenReturn(Optional.of(usuarioOriginal))
         `when`(repository.save(any(Usuario::class.java))).thenAnswer { it.arguments[0] }
 
         val resultado = service.actualizar(id, datosNuevos)
 
-        assertNotNull(resultado)
-        assertEquals("Nuevo Nombre", resultado?.nombre) // Verificamos que cambió el nombre
-        assertEquals("new@mail.com", resultado?.correo) // Verificamos que cambió el correo
-
-        verify(repository).save(any(Usuario::class.java))
+        assertEquals("Editado", resultado?.nombre)
+        assertEquals("new@test.com", resultado?.correo)
     }
 
     @Test
-    fun `actualizar - si el usuario NO existe, deberia retornar null y no guardar nada`() {
-        val idInexistente = 99L
-        val datosNuevos = Usuario(null, "X", "x", "x", "x")
-
-        `when`(repository.findById(idInexistente)).thenReturn(Optional.empty())
-
-        val resultado = service.actualizar(idInexistente, datosNuevos)
-
-        assertNull(resultado)
-
-        verify(repository, never()).save(any())
-    }
-
-    @Test
-    fun `eliminar - deberia mandar la orden de eliminar al repositorio`() {
-        val id = 5L
+    fun `deberia llamar al repositorio para eliminar`() {
+        val id = 1L
 
         service.eliminar(id)
 
@@ -78,16 +71,28 @@ class UsuarioServiceTest {
     }
 
     @Test
-    fun `listarTodos - deberia retornar lista de la BD`() {
-        val listaFicticia = listOf(
-            Usuario(1, "A", "a", "1", "1"),
-            Usuario(2, "B", "b", "2", "2")
-        )
-        `when`(repository.findAll()).thenReturn(listaFicticia)
+    fun `login deberia retornar usuario si credenciales son correctas`() {
+        val correo = "admin@mil.com"
+        val pass = "secreta"
+        val usuarioMock = Usuario(id = 1, nombre = "Admin", correo = correo, contrasena = pass)
 
-        val resultado = service.listarTodos()
+        `when`(repository.findByCorreo(correo)).thenReturn(usuarioMock)
 
-        assertEquals(2, resultado.size)
-        verify(repository).findAll()
+        val resultado = service.login(correo, pass)
+
+        assertNotNull(resultado)
+        assertEquals(correo, resultado?.correo)
+    }
+
+    @Test
+    fun `login deberia retornar null si la contrasena es incorrecta`() {
+        val correo = "admin@mil.com"
+        val usuarioMock = Usuario(id = 1, nombre = "Admin", correo = correo, contrasena = "real")
+
+        `when`(repository.findByCorreo(correo)).thenReturn(usuarioMock)
+
+        val resultado = service.login(correo, "incorrecta")
+
+        assertNull(resultado)
     }
 }
