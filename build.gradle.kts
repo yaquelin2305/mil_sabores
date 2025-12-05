@@ -23,28 +23,29 @@ repositories {
 
 dependencies {
 
-    // API REST (Web)
+
     implementation("org.springframework.boot:spring-boot-starter-web")
 
-    // JPA / Hibernate
+
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
-    // Validaciones (@NotBlank, @NotNull, @Positive...)
+
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
-    // JSON Kotlin
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    // Reflexión Kotlin
+
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    // --- BASE DE DATOS: MySQL (CORRECTO) ---
-    runtimeOnly("com.mysql:mysql-connector-j:8.0.33")
 
-    // DevTools (solo en desarrollo)
+    runtimeOnly("org.postgresql:postgresql:42.7.3")
+
+
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-    // Testing general
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
