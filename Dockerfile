@@ -1,12 +1,15 @@
 # Etapa 1: build
-FROM gradle:8.5-jdk17 AS build
+FROM eclipse-temurin:21-jdk
+
 WORKDIR /app
+
 COPY . .
+
+# ✅ DAR PERMISO DE EJECUCIÓN
+RUN chmod +x gradlew
+
 RUN ./gradlew build -x test
 
-# Etapa 2: run
-FROM eclipse-temurin:17-jre
-WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+EXPOSE 9090
+
+CMD ["java","-jar","build/libs/mil_sabores-0.0.1-SNAPSHOT.jar"]
